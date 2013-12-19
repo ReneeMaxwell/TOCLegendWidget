@@ -11,7 +11,7 @@ The TOC Legend widget is designed for the ArcGIS Javascript API. It provides a m
 * ArcGIS JavaScript API version 3.5 or higher.
 
 ## Quickstart
- [View the Quickstart demo here.](https://github.com/ReneeMaxwell/TOCLegendWidget/samples/quickstart.html)
+ [View the Quickstart demo here.](http://htmlpreview.github.io/?https://raw.github.com/ReneeMaxwell/TOCLegendWidget/master/samples/quickstart.html)
 
 	var map = new Map("mapDiv");
     var imgParams = new ImageParameters();
