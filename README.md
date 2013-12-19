@@ -3,9 +3,9 @@
 ## Features
 The TOC Legend widget is designed for the ArcGIS Javascript API. It provides a map display table of contents (TOC) and symbology legend that allows the toggling of layer visibility.
 
-[View it live](https://github.com/ReneeMaxwell/TOCLegendWidget/samples/quickstart.html)
+[View it live](samples/quickstart.html)
 
-[![App](https://https://github.com/ReneeMaxwell/TOCLegendWidget/docs/toclegend_screenshot.png)](https://github.com/ReneeMaxwell/TOCLegendWidget/samples/quickstart.html)
+[![App](docs/toclegend_screenshot.png)](samples/quickstart.html)
 
 ## Requirements
 * ArcGIS JavaScript API version 3.5 or higher.
