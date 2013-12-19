@@ -3,15 +3,15 @@
 ## Features
 The TOC Legend widget is designed for the ArcGIS Javascript API. It provides a map display table of contents (TOC) and symbology legend that allows the toggling of layer visibility.
 
-[View it live](http://maxwellr.github.io/arcgis-dijit-layer-legend-js/)
+[View it live](https://github.com/ReneeMaxwell/TOCLegendWidget/samples/quickstart.html)
 
-[![App](https://raw.github.com/ReneeMaxwell/TOCLegendWidget/docs/toclegend_screenshot.png)](http://maxwellr.github.io/arcgis-dijit-layer-legend-js/)
+[![App](https://https://github.com/ReneeMaxwell/TOCLegendWidget/docs/toclegend_screenshot.png)](https://github.com/ReneeMaxwell/TOCLegendWidget/samples/quickstart.html)
 
 ## Requirements
 * ArcGIS JavaScript API version 3.5 or higher.
 
 ## Quickstart
- [View the Quickstart demo here.](http://maxwellr.github.io/arcgis-toc-legend/samples/quickstart.html)
+ [View the Quickstart demo here.](https://github.com/ReneeMaxwell/TOCLegendWidget/samples/quickstart.html)
 
 	var map = new Map("mapDiv");
     var imgParams = new ImageParameters();
