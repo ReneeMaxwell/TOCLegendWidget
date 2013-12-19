@@ -3,15 +3,12 @@
 ## Features
 The TOC Legend widget is designed for the ArcGIS Javascript API. It provides a map display table of contents (TOC) and symbology legend that allows the toggling of layer visibility.
 
-[View it live](samples/quickstart.html)
-
-[![App](docs/toclegend_screenshot.png)](samples/quickstart.html)
+[![App](docs/toclegend_screenshot.png)]
 
 ## Requirements
 * ArcGIS JavaScript API version 3.5 or higher.
 
 ## Quickstart
- [View the Quickstart demo here.](http://htmlpreview.github.io/?https://raw.github.com/ReneeMaxwell/TOCLegendWidget/master/samples/quickstart.html)
 
 	var map = new Map("mapDiv");
     var imgParams = new ImageParameters();
@@ -26,8 +23,6 @@ The TOC Legend widget is designed for the ArcGIS Javascript API. It provides a m
         var toc = new TocWidget({
             MapService: demomap,
             MapControl: map,
-            ShowCheckBoxes: true,
-            ToggleAll: true,
             Title: "Louisville Public Safety",
             Expand: { options: "all"} 
         }, "tocDiv");
@@ -206,7 +201,7 @@ fancy dijit checkbox styles in the legend.
 			- Subchild Group
 				- More layers
 				- More layers
-* This widget is not optimized for use on mobile devices and has not been tested for mobile deployment.
+* This widget is not optimized for use on mobile devices and has not been tested for mobile deployment, mainly due to the fact that most mobile mapping apps do not include a legend.
 
 ## Resources
 
