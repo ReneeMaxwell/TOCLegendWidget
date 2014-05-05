@@ -1,0 +1,206 @@
+<!DOCTYPE HTML>
+<html>
+<head> 
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>TOC Legend Widget Variations</title>
+    
+    <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/esri/css/esri.css" type="text/css" />
+    <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dijit/themes/claro/claro.css" type="text/css" />
+    <link rel="stylesheet" href="stylesheet.css" type="text/css" />
+    <link rel="stylesheet" href="css/MapToc.css" type="text/css" />
+    <script type="text/javascript">
+        var dojoConfig = {
+            packages: [{
+                name: "myWidgets", 
+                location: location.pathname.replace(/\/[^/]+$/, '') + '/js'
+            }]
+        }
+    </script>
+    <script src="http://js.arcgis.com/3.7/" type="text/javascript"></script>
+    <script type="text/javascript">
+        require(["myWidgets/TocWidgetMin", "esri/map", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/ImageParameters", "dijit/form/ToggleButton",
+            "dojo/parser", "dojo/on", "dojo/dom-attr", "dojo/dom-class", "dojo/domReady!"],
+        function (TocWidget, Map, DynamicMapService, ImageParameters, ToggleButton, parser, on, attr, domClass) {
+            parser.parse();
+            var map = new Map("mapDiv");
+            var imgParams = new ImageParameters();
+            imgParams.format = "PNG24";
+            // MAP 1: USA OWNER-OCCUPIED HOUSE DEMOGRAPHICS
+            var demo1url = "http://server.arcgisonline.com/ArcGIS/rest/services/Demographics/USA_Owner_Occupied_Housing/MapServer";
+            var demoMap1 = new DynamicMapService(demo1url, { id: "demo1", "imageParameters": imgParams });
+            // MAP 2: PUBLIC SAFETY HAZARDS AND RISKS
+            var demo2url = "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/PublicSafety/PublicSafetyHazardsandRisks/MapServer";
+            var demoMap2 = new DynamicMapService(demo2url, { id: "demo2", "imageParameters": imgParams });
+            // MAP 3: PUBLIC SAFETY POINTS
+            var demo3url = "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Louisville/LOJIC_PublicSafety_Louisville/MapServer";
+            var demoMap3 = new DynamicMapService(demo3url, { id: "demo3", "imageParameters": imgParams });
+            // MAP 4: PUBLIC SAFETY FEED SAMPLE
+            var demo4url = "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/PublicSafety/PublicSafetyFeedSample/MapServer";
+            var demoMap4 = new DynamicMapService(demo4url, { id: "demo4", "imageParameters": imgParams });
+            // MAP 5: LOUISVILLE LAND USE
+            var demo5url = "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Louisville/LOJIC_LandRecords_Louisville/MapServer";
+            var demoMap5 = new DynamicMapService(demo5url, { id: "demo5", "imageParameters": imgParams });
+            map.addLayers([demoMap1, demoMap5, demoMap2, demoMap3, demoMap4]);
+
+            on(map, 'update-start', function () { domClass.add("loadDiv", "showLoad"); domClass.remove("loadDiv", "hideLoad"); });
+            on(map, 'update-end', function () { domClass.add("loadDiv", "hideLoad"); domClass.remove("loadDiv", "showLoad"); });
+
+            on(map, 'layers-add-result', function () {
+                map.setExtent(demoMap3.fullExtent);
+
+                // PUBLIC SAFETY FEED SAMPLE
+                /* No checkboxes    */
+                /* Show Title       */
+                var toc1 = new TocWidget({
+                    MapService: demoMap1,
+                    MapControl: map,
+                    ShowCheckBoxes: false,
+                    Title: "USA Owner-Occupied Housing Demographics",
+                    Expand: { options: "list", expandLayers: [0] }
+                }, "toc1");
+
+                // LAND USE
+                /* All layers collapsed - layers have multiple symbol values    */
+                var toc2 = new TocWidget({
+                    MapService: demoMap5,
+                    MapControl: map,
+                    ShowCheckBoxes: true,
+                    ToggleAll: true,
+                    Expand: { options: "none" }
+                }, "toc2");
+
+                // PUBLIC SAFETY HAZARDS AND RISKS
+                /* List hidden layers: HideLayersList   */
+                /* All group layers and multi-symbol layers expanded   */
+                var toc3 = new TocWidget({
+                    MapService: demoMap2,
+                    MapControl: map,
+                    ShowCheckBoxes: true,
+                    HideLayersList: [4, 5],
+                    ToggleAll: true,
+                    Expand: { options: "all" }
+                }, "toc3");
+
+                // PUBLIC SAFETY POINTS
+                /* Simple legend with all layers checked    */
+                /* Map service set to hidden on load, all layers disabled   */
+                var toc4 = new TocWidget({
+                    MapService: demoMap3,
+                    MapControl: map,
+                    ShowCheckBoxes: true,
+                    ToggleAll: true,
+                    Expand: { options: "none" }
+                }, "toc4");
+
+                // LOAD BUTTONS AFTER TOC HAS FINISHED LOADING
+                // BUTTONS WILL ALLOW USER TO HIDE/SHOW MAP SERVICE
+                toc1.watch("loaded", function (prop, oldVal, newVal) {
+                    addButton("demo1", "toc1btndiv");
+                });
+                toc4.watch("loaded", function (prop, oldVal, newVal) {
+                    //TURN OFF MAP SERVICE ON INITIAL LOAD
+                    demoMap3.hide();
+                    addButton("demo3", "toc4btndiv");
+                });
+
+                function addButton(svcName, btnDiv) {
+                    var mapSvc = map.getLayer(svcName);
+                    //log(mapSvc.visibleAtMapScale);
+                    var mapBtn = new ToggleButton({
+                        showLabel: true,
+                        iconClass: "dijitCheckBoxIcon",
+                        style: "margin-bottom: 10px;",
+                        title: "Click to toggle map display",
+                        onChange: function (chkd) {
+                            if (chkd) {
+                                this.set("label", "Map Service Display: On");
+                            } else { this.set("label", "Map Service Display: Off"); }
+                        },
+                        onClick: function () {
+                            if (this.checked) {
+                                mapSvc.show();
+                            } else { mapSvc.hide(); }
+                        }
+                    }, btnDiv, "first");
+                    if (!mapSvc.visibleAtMapScale) { mapBtn.set("disabled", "disabled"); }
+                    if (mapSvc.visible) { mapBtn.set("label", "Map Service Display: On"); mapBtn.set("checked", "checked"); }
+                    else { mapBtn.set("label", "Map Service Display: Off"); }
+
+                    if (((mapSvc.minScale) && (mapSvc.minScale > 0)) || ((mapSvc.maxScale) && (mapSvc.maxScale > 0))) {
+                        var hasMin, hasMax;
+                        if ((mapSvc.minScale) && (mapSvc.minScale > 0)) { hasMin = true; } else { hasMin = false; }
+                        if ((mapSvc.maxScale) && (mapSvc.maxScale > 0)) { hasMax = true; } else { hasMax = false; }
+
+                        if ((hasMin) || (hasMax)) {
+                            var mapscale = Math.round(map.getScale());
+                            if ((hasMin) && (mapSvc.minScale < mapscale)) { mapBtn.set("disabled", "disabled"); mapBtn.set("title", "Zoom in to enable these map features"); }
+                            else if ((hasMax) && (mapSvc.maxScale > mapscale)) { mapBtn.set("disabled", "disabled"); mapBtn.set("title", "Zoom in to enable these map features"); }
+
+                            on(map, "zoom-end", function () {
+                                var scale = Math.round(map.getScale());
+                                if (((hasMin) && (mapSvc.minScale < scale)) || ((hasMax) && (mapSvc.maxScale > scale)))
+                                { mapBtn.set("disabled", "disabled"); mapBtn.set("title", "Zoom in to enable these map features"); }
+                                else if (((hasMin) && (mapSvc.minScale > scale)) || ((hasMax) && (mapSvc.maxScale < scale)))
+                                { mapBtn.set("disabled", false); mapBtn.set("title", "Click to toggle map display"); }
+                            });
+                        }
+                    }
+
+                    mapSvc.on("visibility-change", setButton);
+
+                    function setButton(vis) {
+                        if (!vis.visible) {
+                            mapBtn.set("label", "Map Service Display: Off");
+                            mapBtn.set("checked", false);
+                        } else {
+                            mapBtn.set("label", "Map Service Display: On");
+                            mapBtn.set("checked", "checked");
+                        }
+                    }
+                }
+            });
+
+            on(map, 'extent-change', function () {
+                var scale = Math.round(map.getScale());
+                attr.set("showMapScale", "innerHTML", "Map scale: " + scale);
+            });
+        });
+    </script>
+
+</head>
+<body class="claro">
+    <div id="leftPanel">
+        <h1>TOC Legend Widget Variations</h1>
+        <div id="panel1" data-dojo-type="dijit/TitlePane" title="TOC 1: Legend Only - No Checkboxes" open="false" doLayout="false">
+            <div id="toc1btndiv"></div>
+            <div id="toc1"></div>
+        </div>
+
+        <div id="panel2" data-dojo-type="dijit/TitlePane" title="TOC 2: Land Use Layers" open="false" doLayout="false">
+            <div id="toc2"></div>
+        </div>
+
+        <div id="panel3" data-dojo-type="dijit/TitlePane" title="Public Safety Maps" open="true" doLayout="false">
+            <div dojoType="dijit/layout/TabContainer" doLayout="false" id="tocTabs">    
+                <div dojoType="dijit/layout/ContentPane" title="TOC 3: Hazards and Risks" doLayout="false">
+                    <div id="toc3btndiv"></div>
+                    <div id="toc3"></div>
+                </div>
+
+                <div dojoType="dijit/layout/ContentPane" title="TOC 4: Public Safety Locations">
+                    <div id="toc4btndiv"></div>
+                    <div id="toc4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+        
+    <div id="mapPanel">
+        <div id="loadDiv">LOADING . . .</div>
+        <div id="mapDiv"></div>
+        <div id="showMapScale"></div>
+    </div>
+  
+</body>
+</html>
+

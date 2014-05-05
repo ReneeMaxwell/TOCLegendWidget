@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html>
+<head> 
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>TOC Legend Widget Alternate Layouts</title>
+    
+    <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/esri/css/esri.css" type="text/css" />
+    <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dijit/themes/claro/claro.css" type="text/css" />
+    <link rel="stylesheet" href="stylesheet.css" type="text/css" />
+    <link rel="stylesheet" href="css/MapToc.css" type="text/css" />
+    <script type="text/javascript">
+        var dojoConfig = {
+            packages: [{
+                name: "myWidgets", 
+                location: location.pathname.replace(/\/[^/]+$/, '') + '/js'
+            }]
+        }
+    </script>
+    <script src="http://js.arcgis.com/3.7/" type="text/javascript"></script>
+    <script type="text/javascript">
+        require(["myWidgets/TocWidget", "esri/map", "esri/layers/ArcGISDynamicMapServiceLayer", "esri/layers/ImageParameters",
+            "dijit/TooltipDialog", "dijit/form/DropDownButton",  "dojo/parser", "dojo/on", "dojo/dom-attr", "dojo/dom-class", "dojo/domReady!"],
+        function (TocWidget, Map, DynamicMapService, ImageParameters, TooltipDialog, DropDownButton, parser, on, attr, domClass) {
+            parser.parse();
+            var map = new Map("mapFullPanel", { basemap: "streets" });
+            var imgParams = new ImageParameters();
+            imgParams.format = "PNG24";
+            // MAP 1: USA OWNER-OCCUPIED HOUSE DEMOGRAPHICS
+            var demoMap1 = new DynamicMapService("http://sampleserver6.arcgisonline.com/arcgis/rest/services/CommunityAddressing/MapServer",
+                { id: "demo1", "imageParameters": imgParams });
+            var demoMap2 = new DynamicMapService("http://sampleserver6.arcgisonline.com/arcgis/rest/services/DamageAssessment/MapServer",
+                { id: "demo2", "imageParameters": imgParams });
+            map.addLayers([demoMap1, demoMap2]);
+
+            on(map, 'update-start', function () { domClass.add("loadFullPanel", "showLoad"); domClass.remove("loadFullPanel", "hideLoad"); });
+            on(map, 'update-end', function () { domClass.add("loadFullPanel", "hideLoad"); domClass.remove("loadFullPanel", "showLoad"); });
+
+            on(map, 'layers-add-result', function () {
+                //console.log("add");
+                //var napvl = new Extent(-9831012.711, 5105138.97, -9797036.451, 5138197.985, map.spatialReference);
+                //map.setExtent(napvl);
+                map.setExtent(demoMap1.fullExtent.expand(0.4));
+
+                var toc1 = new TocWidget({
+                    MapService: demoMap1,
+                    MapControl: map,
+                    ShowCheckBoxes: true,
+                    ToggleAll: true,
+                    className: "cornerLegend",
+                    Expand: { options: "all" }
+                }, "mapToc");
+
+                var toc2 = new TocWidget({
+                    MapService: demoMap2,
+                    MapControl: map,
+                    ShowCheckBoxes: true,
+                    ToggleAll: true,
+                    Expand: { options: "all" }
+                }, "otherToc");
+            });
+        });
+    </script>
+
+</head>
+<body class="claro">
+    <div id="banner">
+        <h1 class="heading">TOC Legend Widget Alternate Layouts</h1>
+        <button data-dojo-type="dijit/form/DropDownButton" type="button" class="tocMenu">
+            <span>Legend</span>
+            <div data-dojo-type="dijit/TooltipDialog" id="tocWindow">
+                <div id="otherToc"></div>
+            </div>
+        </button>
+    </div>
+        
+    <div id="loadFullPanel">LOADING . . .</div>
+    <div id="mapFullPanel"></div>
+    <div id="mapToc"></div>
+  
+</body>
+</html>
+
